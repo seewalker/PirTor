@@ -1,0 +1,135 @@
+
+# if a policy uses this value for a pir parameter, that means server will choose the minimum value within the intersection of client and servers' ranges.
+min_def: &min
+    0
+# if a policy uses this value for a pir parameter, that means server will choose the maximum value within the intersection of client and servers' ranges.
+max_def: &max
+    1
+# if a policy uses this value for a pir parameter, that means server will use optimizer to determine the "best" value subject to the constraints of the client and server ranges. 
+optimizer_def: &optimizer
+    2
+
+# where to store logs of runtime behavior.
+request_log: "~/.tor/pir_request.sql" 
+response_log: "~/.tor/pir_response.sql" 
+
+# a range of values for different pir parameters.
+client: &client_params
+    # minimum number of entries which the client says it wants.
+    n_req_lo : 3
+    # maximum number of entries which the client says it wants.
+    n_req_hi : 8
+    # priorities for different PIR algorithms (higher number means higher priority).
+    algos: 
+        xpir : 1
+        ag : 0
+    # pir parameters related to xpir.
+    xpir:
+        # priorities for crypto methods for xpir which the client is willing to deal with.
+        methods:
+            lwe: 1
+            pailier: 0
+        # lower bounds of xpir parameters
+        lower:
+            alpha : 1
+            d : 1
+            n : [1,0,0,0,0,0,0,0,0,0]
+            lwe:
+                security_bits : 80
+                poly_degree : 2048
+                poly_coeff_bits : 120
+            pailier:
+                security_bits : 128
+                bitKeySize : 128
+                ciphSize :  128
+        # upper bounds of xpir parameters
+        upper:
+            alpha : 1
+            d : 1
+            n : [5,4,0,0,0,0,0,0,0,0]
+            lwe:
+                security_bits :  80
+                poly_degree :  2048
+                poly_coeff_bits :  120
+            pailier:
+                security_bits : 256
+                bitKeySize : 256
+                ciphSize :  256
+        policy:
+            alpha : *min
+            d : *min
+            n : *min 
+            lwe:
+                security_bits : *max
+                poly_degree : *min
+                poly_coeff_bits : *max
+            pailier: 
+                security_bits : *max
+                bitKeySize : *max
+                ciphSize : *max
+
+server:
+    # since PIR can involve 
+    max_clients : 3
+    will_serve_microdescriptors : 1
+    will_serve_descriptors : 1
+    # number of seconds to wait for a negotiation message after connecting.
+    negotiate_timeout : 20
+    # number of seconds to wait for the next query message after negotiation.
+    query_timeout : 20
+    # minimum number of entries which the server says it will give
+    n_req_lo : 3
+    # maximum number of entries which the server says it will give.
+    n_req_hi : 8
+    # priorities for different PIR algorithms (higher number means higher priority).
+    algos: 
+        xpir : 1
+        ag : 0
+    # pir parameters related to xpir.
+    xpir:
+        # priorities for crypto methods for xpir which the server is willing to deal with.
+        methods:
+            lwe: 1
+            pailier: 0
+        # lower bounds of xpir parameters
+        lower:
+            alpha : 1
+            d : 1
+            n : [1,0,0,0,0,0,0,0,0,0]
+            lwe:
+                security_bits : 80
+                poly_degree : 2048
+                poly_coeff_bits : 120
+            pailier:
+                security_bits : 128
+                bitKeySize : 128
+                ciphSize :  128
+        # upper bounds of xpir parameters
+        upper:
+            alpha : 1
+            d : 1
+            n : [5,4,0,0,0,0,0,0,0,0]
+            lwe:
+                security_bits :  80
+                poly_degree :  2048
+                poly_coeff_bits :  120
+            pailier:
+                security_bits : 256
+                bitKeySize : 256
+                ciphSize :  256
+        policy:
+            alpha : *min
+            d : *min
+            n : *min 
+            lwe:
+                security_bits : *max
+                poly_degree : *min
+                poly_coeff_bits : *max
+            pailier: 
+                security_bits : *max
+                bitKeySize : *max
+                ciphSize : *max
+
+paths:
+    programs: /home/aseewald/pir/pirtor
+    db: /home/aseewald/.tor/pirdb
